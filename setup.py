@@ -1,8 +1,6 @@
 import os
 from setuptools import setup, find_packages
-datadir = os.path.join('share','data')
-datafiles = [(d, [os.path.join(d,f) for f in files])
-    for d, folders, files in os.walk(datadir)]
+
 setup(
     name = "blackjacksim",
     version = "0.0.1",
@@ -16,7 +14,7 @@ setup(
               'blackjacksim.simulations',
               'blackjacksim.entities',
               'blackjacksim.strategies'],
-    data_files = datafiles,
+    data_files = [('blackjacksim', ['blackjacksim/strategies/basic.json'])],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
