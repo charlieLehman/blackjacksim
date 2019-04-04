@@ -19,7 +19,11 @@ class Card(object):
 class Hand(collections.MutableSequence):
     def __init__(self, cards):
         self.cards = cards
+        self._action_hist = []
         self.stand = False
+        self.blackack_on_split = False
+        self.ID = None
+        self.isSplit = False
 
     def __len__(self):
         return len(self.cards)
@@ -37,10 +41,25 @@ class Hand(collections.MutableSequence):
         return self.cards.__getitem__(index)
 
     def __repr__(self):
-        return str(self.cards)
+        return "{}: {}".format(self.ID, str(self.cards))
+
+    def log(self, action):
+        self._action_hist.append(action)
+
+    def copy(self):
+        _h = Hand(self)
+        _h._action_hist = self._action_hist.copy()
+        _h.stand = self.stand
+        _h.isSplit = self.isSplit
+        _h.ID = self.ID
+        return _h
 
     @property
     def blackjack(self):
+        # probably should put this is payout rules
+        #return self.value==21 and self.__len__()==2 and not self.isSplit
+        if not self.blackack_on_split and self.isSplit:
+            return False
         return self.value==21 and self.__len__()==2
 
     @property
@@ -61,7 +80,12 @@ class Hand(collections.MutableSequence):
         for card in self.cards:
             if card.name == 'A':
                 card.value = 11
-        return Hand([self.cards[0]]), Hand([self.cards[1]])
+        h1, h2 = Hand([self.cards[0]]), Hand([self.cards[1]])
+        h1.ID = '{}_Split_{}'.format(self.ID, 0)
+        h1.isSplit = True
+        h2.ID = '{}_Split_{}'.format(self.ID, 1)
+        h2.isSplit = True
+        return h1, h2
 
     @property
     def value(self):
@@ -109,12 +133,13 @@ class Deck(object):
 class Shoe(object):
     def __init__(self, size, penetration):
         self._shoe = []
+        self._dealt = []
         self.size = size
         self.penetration = penetration
         for _ in range(size):
             self._shoe.extend(Deck())
         self.orig_len = len(self._shoe)
-        random.shuffle(self._shoe)
+        random.shuffle(self)
 
     def __getitem__(self, index):
         return self._shoe[index]
@@ -140,5 +165,6 @@ class Shoe(object):
 
     def draw(self, number=1):
         _d = self._shoe[:number].copy()
+        self._dealt.extend(_d)
         del self._shoe[:number]
         return Hand(_d)

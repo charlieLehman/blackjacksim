@@ -1,24 +1,25 @@
 from blackjacksim.strategies import hit_on_soft_17, stand_on_soft_17
 
 class Player(object):
-    def __init__(self, action_strategy, wager_strategy, wager_unit, wager_pool):
+    def __init__(self, action_strategy, wager_strategy, payout_rules):
         self.action_strategy = action_strategy
         self.wager_strategy = wager_strategy
-        self.wager_unit = wager_unit
-        self.wager_pool = wager_pool
+        self.payout_rules = payout_rules
 
     def deal(self, shoe):
         self.hands = []
+        self._hand_id_count = 0
         shoe = shoe()
-        self.hands.append(shoe.draw(2))
+        h = shoe.draw(2)
+        h.ID = self._hand_id()
+        wager = self.wager_strategy.make_wager(shoe)
+        self.payout_rules.initial(h, wager)
+        self.hands.append(h)
         return shoe
 
-    def make_wager(self):
-        ## TODO Wager handler
-        for hand in self.hands:
-            wager = self.wager_strategy(hand, self.wager_unit)
-            self.wager_pool -= wager
-        return
+    def _hand_id(self):
+        self._hand_id_count += 1
+        return '{:04d}'.format(self._hand_id_count)
 
     def play(self, shoe, dealer_up_card):
         shoe = shoe()
@@ -31,6 +32,7 @@ class Player(object):
         return shoe
 
     def take_action(self, hand, shoe, action):
+        hand.log(action)
 
         if action == 'Stand':
             return
@@ -42,14 +44,17 @@ class Player(object):
 
         elif action == 'Double':
             ## TODO Wager handler
+            wager = self.wager_strategy.make_wager(shoe)
+            self.payout_rules.double(hand, wager)
             hand.extend(shoe.draw(1))
-            new_action = self.action_strategy(hand, self.dealer_up_card)
-            self.take_action(hand, shoe, new_action)
+            return
 
         elif action == 'Split':
+            # this may be dangerous because it just removes the first one it encounters
             if hand in self.hands: self.hands.remove(hand)
-            for new_hand in hand.split():
-                ## TODO Wager handler
+            wager = self.wager_strategy.make_wager(shoe)
+            for new_hand, new_wager in zip(hand.split(), self.payout_rules.split(hand,wager)):
+                new_wager(new_hand)
                 new_hand.extend(shoe.draw(1))
                 self.hands.append(new_hand)
                 new_action = self.action_strategy(new_hand, self.dealer_up_card)
