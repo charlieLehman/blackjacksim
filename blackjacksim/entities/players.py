@@ -1,9 +1,9 @@
 from blackjacksim.strategies import hit_on_soft_17, stand_on_soft_17
 
 class Player(object):
-    def __init__(self, action_strategy, wager_strategy, payout_rules):
+    def __init__(self, action_strategy, wallet, payout_rules):
         self.action_strategy = action_strategy
-        self.wager_strategy = wager_strategy
+        self.wallet = wallet
         self.payout_rules = payout_rules
 
     def deal(self, shoe):
@@ -12,7 +12,7 @@ class Player(object):
         shoe = shoe()
         h = shoe.draw(2)
         h.ID = self._hand_id()
-        wager = self.wager_strategy.make_wager(shoe)
+        wager = self.wallet.make_wager(shoe)
         self.payout_rules.initial(h, wager)
         self.hands.append(h)
         return shoe
@@ -32,6 +32,10 @@ class Player(object):
         return shoe
 
     def take_action(self, hand, shoe, action):
+
+        if self.wallet.is_broke:
+            return
+
         hand.log(action)
 
         if action == 'Stand':
@@ -44,7 +48,7 @@ class Player(object):
 
         elif action == 'Double':
             ## TODO Wager handler
-            wager = self.wager_strategy.make_wager(shoe)
+            wager = self.wallet.make_wager(shoe)
             self.payout_rules.double(hand, wager)
             hand.extend(shoe.draw(1))
             return
@@ -52,7 +56,7 @@ class Player(object):
         elif action == 'Split':
             # this may be dangerous because it just removes the first one it encounters
             if hand in self.hands: self.hands.remove(hand)
-            wager = self.wager_strategy.make_wager(shoe)
+            wager = self.wallet.make_wager(shoe)
             for new_hand, new_wager in zip(hand.split(), self.payout_rules.split(hand,wager)):
                 new_wager(new_hand)
                 new_hand.extend(shoe.draw(1))

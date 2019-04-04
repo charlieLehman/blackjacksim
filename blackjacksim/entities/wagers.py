@@ -10,9 +10,13 @@ class PlayerWallet(object):
         return self.wager_unit
 
     def take_payout(self, payout):
-        self.attempts += 1 if payout != 0 else 0
+        self.attempts += 0 if payout == self.wager_unit else 1
         self.wins += 1 if payout > 0 else 0
         self.wager_pool += payout
+
+    @property
+    def is_broke(self):
+        return self.wager_pool - self.wager_unit <= 0
 
 class _HouseRules(object):
     def __init__(self, normal, blackjack, split_blackjack):
@@ -34,7 +38,7 @@ class _HouseRules(object):
 
     def double(self, hand, wager):
         if wager != self.wager_pool[hand.ID]:
-            raise Exception('Not properly double down action: Initial bet {}, doubled bet {}'.format(self.wager_pool[hand.ID], wager))
+            raise Exception('Not proper double down action: Initial bet {}, doubled bet {}'.format(self.wager_pool[hand.ID], wager))
         self.wager_pool[hand.ID] *= 2
 
     @property
@@ -79,7 +83,7 @@ class _HouseRules(object):
             elif win_state == 'Lose':
                 pay = 0
             elif win_state == 'Win':
-                pay = wager*self.payout_on_normal
+                pay = wager*(1+self.payout_on_normal)
             elif win_state == 'Push':
                 pay = wager
             if self.settled:
