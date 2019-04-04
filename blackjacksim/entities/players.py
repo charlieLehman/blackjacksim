@@ -48,6 +48,8 @@ class Player(object):
                 self.hands.remove(hand)
                 # recurse over modified hand
                 self.play(shoe, self.dealer_up_card)
+            else:
+                raise Exception('Broke')
         return
 
     def __repr__(self):

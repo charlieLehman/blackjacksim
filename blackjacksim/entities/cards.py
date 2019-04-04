@@ -40,7 +40,7 @@ class Hand(collections.MutableSequence):
 
     @property
     def splittable(self):
-        return len(self.cards) == 2 and self.cards[0] == self.cards[1]
+        return len(self.cards) == 2 and self.cards[0].name == self.cards[1].name
 
     @property
     def _a_idx(self):
@@ -63,7 +63,7 @@ class Hand(collections.MutableSequence):
         _value = 0
         for card in cards:
             _value += card.value
-        if _value > 21 and self.soft:
+        if _value > 21:
             for card in list(itertools.compress(cards,self._a_idx)):
                 card.value = 1
                 _value -= 10

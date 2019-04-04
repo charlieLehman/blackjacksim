@@ -9,6 +9,10 @@ with open(basic_path, 'r') as strat:
 
 def basic(hand, dealer_up_card):
     _type, _v = hand.strategy_value
-    return _basic[dealer_up_card][_type][_v]
+    if dealer_up_card.name == 'A':
+        n = '11'
+    else:
+        n = str(dealer_up_card.value)
+    return _basic[n][_type][_v]
 
 
