@@ -15,6 +15,7 @@ setup(
               'blackjacksim.entities',
               'blackjacksim.strategies'],
     data_files = [('blackjacksim', ['blackjacksim/strategies/basic.json'])],
+    include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Topic :: Utilities",
