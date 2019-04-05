@@ -2,17 +2,24 @@ class PlayerWallet(object):
     def __init__(self, wager_unit, wager_pool):
         self.wager_unit = wager_unit
         self.wager_pool = wager_pool
-        self.wins = 0
-        self.attempts = 0
+        self.round_wagers = 0
+        self.round_payouts = 0
 
     def make_wager(self, shoe):
         self.wager_pool -= self.wager_unit
+        self.round_wagers += self.wager_unit
         return self.wager_unit
 
     def take_payout(self, payout):
-        self.attempts += 0 if payout == self.wager_unit else 1
-        self.wins += 1 if payout > 0 else 0
         self.wager_pool += payout
+        self.round_payouts += payout
+
+    def finish_round(self):
+        _rw = self.round_wagers
+        _rp = self.round_payouts
+        self.round_wagers = 0
+        self.round_payouts = 0
+        return _rw, _rp
 
     @property
     def is_broke(self):
