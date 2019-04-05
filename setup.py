@@ -27,7 +27,6 @@ setup(
         "seaborn",
         "scipy",
         "tqdm",
-        "jupyter",
 ],
      dependency_links=[
     ]
