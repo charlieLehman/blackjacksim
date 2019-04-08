@@ -64,7 +64,7 @@ class Hand(collections.MutableSequence):
 
     @property
     def splittable(self):
-        return len(self.cards) == 2 and self.cards[0].name == self.cards[1].name
+        return len(self.cards) == 2 and self.cards[0].name == self.cards[1].name and not self.isSplit
 
     @property
     def _a_idx(self):
