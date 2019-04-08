@@ -1,10 +1,10 @@
 from blackjacksim.strategies import hit_on_soft_17, stand_on_soft_17
 
 class Player(object):
-    def __init__(self, action_strategy, wallet, payout_rules):
+    def __init__(self, action_strategy, wallet, house):
         self.action_strategy = action_strategy
         self.wallet = wallet
-        self.payout_rules = payout_rules
+        self.house = house
 
     def deal(self, shoe):
         self.hands = []
@@ -13,7 +13,7 @@ class Player(object):
         h = shoe.draw(2)
         h.ID = self._hand_id()
         wager = self.wallet.make_wager(shoe)
-        self.payout_rules.initial(h, wager)
+        self.house.initial(h, wager)
         self.hands.append(h)
         return shoe
 
@@ -49,7 +49,7 @@ class Player(object):
         elif action == 'Double':
             ## TODO Wager handler
             wager = self.wallet.make_wager(shoe)
-            self.payout_rules.double(hand, wager)
+            self.house.double(hand, wager)
             hand.extend(shoe.draw(1))
             return
 
@@ -57,7 +57,7 @@ class Player(object):
             # this may be dangerous because it just removes the first one it encounters
             if hand in self.hands: self.hands.remove(hand)
             wager = self.wallet.make_wager(shoe)
-            for new_hand, new_wager in zip(hand.split(), self.payout_rules.split(hand,wager)):
+            for new_hand, new_wager in zip(hand.split(), self.house.split(hand,wager)):
                 new_wager(new_hand)
                 new_hand.extend(shoe.draw(1))
                 self.hands.append(new_hand)
@@ -79,7 +79,6 @@ class Dealer(object):
         self.strategy = strategy
 
     def deal(self, shoe):
-        self.hands = None
         shoe = shoe()
         self.hand = shoe.draw(2)
         return shoe
@@ -94,15 +93,26 @@ class Dealer(object):
 
     def play(self, shoe, players_hands):
         shoe = shoe()
+
         if all([h.bust for h in players_hands]):
             return shoe
-        while not (self.hand.stand or self.hand.bust):
-            action = self.strategy(self.hand)
-            if action == 'Stand':
-                self.hand.stand = True
-            if action == 'Hit':
-                self.hand.extend(shoe.draw(1))
+
+        for h in players_hands:
+            if h.blackjack and not self.blackjack:
+                h.player_has_blackjack = True
+
+        if not all([h.player_has_blackjack for h in players_hands]):
+            while not (self.hand.stand or self.hand.bust):
+                action = self.strategy(self.hand)
+                if action == 'Stand':
+                    self.hand.stand = True
+                if action == 'Hit':
+                    self.hand.extend(shoe.draw(1))
+
         return shoe
+
+    def inspect_shoe(self, shoe):
+        return shoe(can_shuffle=True)
 
     def __repr__(self):
         return str([self.hand, self.hand.value])

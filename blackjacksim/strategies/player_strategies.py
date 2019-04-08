@@ -7,6 +7,7 @@ with open(basic_path, 'r') as strat:
 
 def basic(hand, dealer_up_card):
     try:
+        n = None
         if hand.bust:
             return 'Bust'
         _type, _v = hand.strategy_value
@@ -18,6 +19,7 @@ def basic(hand, dealer_up_card):
         return action
     except Exception as e:
         print('Check your strategy JSON for the below condition')
+        print(e)
         print(e, hand, n, _type, _v)
         raise
 

@@ -1,3 +1,3 @@
 from .cards import *
 from .players import *
-from .wagers import *
+from .house import *

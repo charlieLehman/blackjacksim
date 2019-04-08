@@ -17,13 +17,15 @@ class Card(object):
         return ('{} {}'.format(self.name, self.suit))
 
 class Hand(collections.MutableSequence):
-    def __init__(self, cards):
+    def __init__(self, cards, split_limit=2):
         self.cards = cards
         self._action_hist = []
         self.stand = False
-        self.blackack_on_split = False
+        self.blackjack_on_split = False
         self.ID = None
-        self.isSplit = False
+        self.SplitCount = 0
+        self.split_limit = split_limit
+        self.player_has_blackjack = False
 
     def __len__(self):
         return len(self.cards)
@@ -50,7 +52,7 @@ class Hand(collections.MutableSequence):
         _h = Hand(self)
         _h._action_hist = self._action_hist.copy()
         _h.stand = self.stand
-        _h.isSplit = self.isSplit
+        _h.SplitCount = self.SplitCount
         _h.ID = self.ID
         return _h
 
@@ -58,13 +60,12 @@ class Hand(collections.MutableSequence):
     def blackjack(self):
         # probably should put this is payout rules
         #return self.value==21 and self.__len__()==2 and not self.isSplit
-        if not self.blackack_on_split and self.isSplit:
-            return False
-        return self.value==21 and self.__len__()==2
+        _split_rule = self.SplitCount == 0 or self.blackjack_on_split
+        return self.value==21 and len(self)==2 and _split_rule
 
     @property
     def splittable(self):
-        return len(self.cards) == 2 and self.cards[0].name == self.cards[1].name and not self.isSplit
+        return len(self.cards) == 2 and self.cards[0].name == self.cards[1].name and self.SplitCount <= self.split_limit
 
     @property
     def _a_idx(self):
@@ -82,9 +83,9 @@ class Hand(collections.MutableSequence):
                 card.value = 11
         h1, h2 = Hand([self.cards[0]]), Hand([self.cards[1]])
         h1.ID = '{}_Split_{}'.format(self.ID, 0)
-        h1.isSplit = True
+        h1.SplitCount = self.SplitCount + 1
         h2.ID = '{}_Split_{}'.format(self.ID, 1)
-        h2.isSplit = True
+        h2.SplitCount = self.SplitCount + 1
         return h1, h2
 
     @property
@@ -131,15 +132,28 @@ class Deck(object):
         return len(self._deck)
 
 class Shoe(object):
-    def __init__(self, size, penetration):
+    def __init__(self, size, cut_card_position, house_rules):
         self._shoe = []
         self._dealt = []
+        # assuming STANDARD deck is used
+        _s = 4*size
+        self._initial = {'2':_s,
+                         '3':_s,
+                         '4':_s,
+                         '5':_s,
+                         '6':_s,
+                         '7':_s,
+                         '8':_s,
+                         '9':_s,
+                         '10':4*_s,
+                         '11':_s}
         self.size = size
-        self.penetration = penetration
+        self.cut_card_position = cut_card_position
         for _ in range(size):
             self._shoe.extend(Deck())
         self.orig_len = len(self._shoe)
         random.shuffle(self)
+        self.house_rules = house_rules
 
     def __getitem__(self, index):
         return self._shoe[index]
@@ -151,20 +165,28 @@ class Shoe(object):
         return len(self._shoe)
 
     @property
-    def _penetration_state(self):
-        return float(self.__len__())/float(self.orig_len)
+    def state(self):
+        _d = dict(self._initial)
+        for c in self._dealt:
+            _val = c.value if c.value!=1 else 11
+            _d[str(_val)] -= 1
+        return [v for v in _d.values()]
 
-    def __call__(self):
-        if self._penetration_state < self.penetration:
-            return Shoe(self.size, self.penetration)
+    @property
+    def penetration(self):
+        return 1-float(self.__len__())/float(self.orig_len)
+
+    def __call__(self, can_shuffle=False):
+        if self.penetration > self.cut_card_position and can_shuffle:
+            return Shoe(self.size, self.cut_card_position, self.house_rules)
         else:
             return self
 
     def __repr__(self):
         return "{} Deck Shoe with {} cards left or {:.2f} % Penetration".format(self.size, self.__len__(), self._penetration_state*100)
 
-    def draw(self, number=1):
+    def draw(self, number=1, **kwargs):
         _d = self._shoe[:number].copy()
         self._dealt.extend(_d)
         del self._shoe[:number]
-        return Hand(_d)
+        return Hand(_d, **self.house_rules.hand_rules)
