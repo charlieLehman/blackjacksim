@@ -46,5 +46,5 @@ class Game(object):
                     'Shoe Penetration':s_pen,
                     'State':s_state,
                     'Advantage':rp-rw,
-                          'House':str(self.house)})
+                    'House':str(self.house)})
         self.shoe = self.dealer.inspect_shoe(self.shoe)

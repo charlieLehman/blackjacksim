@@ -13,6 +13,7 @@ setup(
     packages=['blackjacksim',
               'blackjacksim.simulations',
               'blackjacksim.entities',
+              'blackjacksim.pytorch',
               'blackjacksim.strategies'],
     data_files = [('blackjacksim', ['blackjacksim/strategies/basic.json'])],
     include_package_data=True,
@@ -27,6 +28,7 @@ setup(
         "seaborn",
         "scipy",
         "tqdm",
+        "torch",
 ],
      dependency_links=[
     ]
