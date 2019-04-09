@@ -26,11 +26,10 @@ class PlayerWallet(object):
         return self.wager_pool - self.wager_unit <= 0
 
 class _HouseRules(object):
-    def __init__(self, normal, blackjack, split_blackjack, split_limit):
+    def __init__(self, normal, blackjack, blackjack_on_split, split_limit):
         self.payout_on_normal = normal[0]/normal[1]
         self.payout_on_blackjack = blackjack[0]/blackjack[1]
-        self.split_blackjack = split_blackjack
-        self.hand_rules = {"split_limit":split_limit}
+        self.hand_rules = {"split_limit":split_limit, "blackjack_on_split":blackjack_on_split}
         self.wager_pool = {}
 
     def initial(self, hand, wager):
@@ -56,13 +55,6 @@ class _HouseRules(object):
         return unsettled == 0
 
     def _get_win_state(self, playerHand, dealerHand):
-
-        # _maybe_blackjack = playerHand.value==21 and len(playerHand)==2
-        # if playerHand.SplitCount > 0 and _maybe_blackjack and self.split_blackjack:
-        #     _tempHand = playerHand.copy()
-        #     _tempHand.SplitCount = 0
-        #     return self._get_win_state(_tempHand, dealerHand)
-
         if playerHand.blackjack and dealerHand.blackjack:
             return 'Push'
         elif dealerHand.blackjack and not playerHand.blackjack:
@@ -108,16 +100,16 @@ class _HouseRules(object):
 
 class Blackjack32(_HouseRules):
     def __init__(self):
-        super(Blackjack32, self).__init__(normal=(1,1), blackjack=(3,2), split_blackjack=True, split_limit=3)
+        super(Blackjack32, self).__init__(normal=(1,1), blackjack=(3,2), blackjack_on_split=True, split_limit=3)
 
 class Blackjack65(_HouseRules):
     def __init__(self):
-        super(Blackjack65, self).__init__(normal=(1,1), blackjack=(6,5), split_blackjack=True, split_limit=3)
+        super(Blackjack65, self).__init__(normal=(1,1), blackjack=(6,5), blackjack_on_split=True, split_limit=3)
 
 class Blackjack32NoSplit(_HouseRules):
     def __init__(self):
-        super(Blackjack32NoSplit, self).__init__(normal=(1,1), blackjack=(3,2), split_blackjack=False, split_limit=3)
+        super(Blackjack32NoSplit, self).__init__(normal=(1,1), blackjack=(3,2), blackjack_on_split=False, split_limit=3)
 
 class Blackjack65NoSplit(_HouseRules):
     def __init__(self):
-        super(Blackjack65NoSplit, self).__init__(normal=(1,1), blackjack=(6,5), split_blackjack=False, split_limit=3)
+        super(Blackjack65NoSplit, self).__init__(normal=(1,1), blackjack=(6,5), blackjack_on_split=False, split_limit=3)

@@ -17,14 +17,14 @@ class Card(object):
         return ('{} {}'.format(self.name, self.suit))
 
 class Hand(collections.MutableSequence):
-    def __init__(self, cards, split_limit=2):
+    def __init__(self, cards, split_limit=2, blackjack_on_split=True):
         self.cards = cards
         self._action_hist = []
         self.stand = False
-        self.blackjack_on_split = False
         self.ID = None
         self.SplitCount = 0
         self.split_limit = split_limit
+        self.blackjack_on_split = blackjack_on_split
         self.player_has_blackjack = False
 
     def __len__(self):
@@ -49,7 +49,7 @@ class Hand(collections.MutableSequence):
         self._action_hist.append(action)
 
     def copy(self):
-        _h = Hand(self)
+        _h = Hand(self, self.split_limit, self.blackjack_on_split)
         _h._action_hist = self._action_hist.copy()
         _h.stand = self.stand
         _h.SplitCount = self.SplitCount
@@ -58,8 +58,6 @@ class Hand(collections.MutableSequence):
 
     @property
     def blackjack(self):
-        # probably should put this is payout rules
-        #return self.value==21 and self.__len__()==2 and not self.isSplit
         _split_rule = self.SplitCount == 0 or self.blackjack_on_split
         return self.value==21 and len(self)==2 and _split_rule
 
@@ -76,12 +74,10 @@ class Hand(collections.MutableSequence):
         return any(self._a_idx)
 
     def split(self):
-        if not self.splittable:
-            raise Exception("Bad Move: Can't split this hand {}".format(self))
         for card in self.cards:
             if card.name == 'A':
                 card.value = 11
-        h1, h2 = Hand([self.cards[0]]), Hand([self.cards[1]])
+        h1, h2 = Hand([self.cards[0]], self.split_limit, self.blackjack_on_split), Hand([self.cards[1]], self.split_limit, self.blackjack_on_split)
         h1.ID = '{}_Split_{}'.format(self.ID, 0)
         h1.SplitCount = self.SplitCount + 1
         h2.ID = '{}_Split_{}'.format(self.ID, 1)
@@ -104,7 +100,7 @@ class Hand(collections.MutableSequence):
     @property
     def strategy_value(self):
         if self.splittable:
-            return "Splittable", "AA" if any(self._a_idx) and len(self.cards) == 2 else str(self.value)
+            return "Splittable", "AA" if all(self._a_idx) else str(self.value)
         elif self.soft:
             return "Soft", str(self.value)
         elif not self.soft:
