@@ -1,4 +1,5 @@
 import itertools
+import numpy as np
 import collections
 import random
 
@@ -166,7 +167,7 @@ class Shoe(object):
         for c in self._dealt:
             _val = c.value if c.value!=1 else 11
             _d[str(_val)] -= 1
-        return [v for v in _d.values()]
+        return np.array([v for v in _d.values()])
 
     @property
     def penetration(self):

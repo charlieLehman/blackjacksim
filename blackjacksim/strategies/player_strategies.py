@@ -1,5 +1,6 @@
 import json
 import pkg_resources
+import random
 
 basic_path = pkg_resources.resource_filename('blackjacksim.strategies','basic.json')
 with open(basic_path, 'r') as strat:
@@ -22,4 +23,7 @@ def basic(hand, dealer_up_card):
         print(e)
         print(e, hand, n, _type, _v)
         raise
+
+def random(hand, dealer_up_card):
+    return random.choice(['Hit', 'Stand'])
 
