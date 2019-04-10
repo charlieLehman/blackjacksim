@@ -1,1 +1,5 @@
 recursive-include strategies/*.json
+recursive-include pytorch/*.json
+recursive-include entities/*.json
+recursive-include simulations/*.json
+recursive-include data/*.json

@@ -14,8 +14,9 @@ setup(
               'blackjacksim.simulations',
               'blackjacksim.entities',
               'blackjacksim.pytorch',
+              'blackjacksim.data',
               'blackjacksim.strategies'],
-    data_files = [('blackjacksim', ['blackjacksim/strategies/basic.json'])],
+    data_files = [('blackjacksim', ['blackjacksim/data/basic.json', 'blackjacksim/data/default_config.json'])],
     include_package_data=True,
     classifiers=[
         "Development Status :: 3 - Alpha",

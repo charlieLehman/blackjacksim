@@ -1,11 +1,12 @@
 import torch
 from torch.utils.data import Dataset
 from blackjacksim.simulations import Game
+from blackjacksim.data import DefaultGameConfig
 import numpy as np
 
-
+_default = DefaultGameConfig()
 class BlackjackDataset(Dataset):
-    def __init__(self, batch_size, config, max_len=5000):
+    def __init__(self, batch_size, config=_default, max_len=5000):
         self.batch_size = batch_size
         self.config = config
         self.max_len = max_len

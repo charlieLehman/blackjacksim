@@ -2,12 +2,14 @@ import blackjacksim
 import pandas as pd
 from blackjacksim.entities import *
 from blackjacksim.strategies import *
+from blackjacksim.data import DefaultGameConfig
 
 def _load(config, name):
     return getattr(blackjacksim.entities, config[name]['class'])(**config[name]['params'])
 
+_default = DefaultGameConfig()
 class Game(object):
-    def __init__(self, config):
+    def __init__(self, config=_default):
         self.wallet = _load(config,'wallet')
         self.house = _load(config,'house')
         self.dealer = _load(config,'dealer')

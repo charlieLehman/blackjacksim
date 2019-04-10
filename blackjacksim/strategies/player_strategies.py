@@ -1,10 +1,7 @@
-import json
-import pkg_resources
 import random
+from blackjacksim.data import BasicStrategy
 
-basic_path = pkg_resources.resource_filename('blackjacksim.strategies','basic.json')
-with open(basic_path, 'r') as strat:
-    _basic = json.load(strat)
+_basic = BasicStrategy()
 
 def basic(hand, dealer_up_card):
     try:

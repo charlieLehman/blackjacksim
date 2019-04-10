@@ -1,0 +1,32 @@
+{
+    "wallet":{
+        "class":"PlayerWallet",
+        "params":{
+            "wager_unit":1,
+            "wager_pool":100
+        }
+    },
+    "house":{
+        "class":"Blackjack32",
+        "params":{}
+    },
+    "dealer":{
+        "class":"Dealer",
+        "params":{
+            "strategy":"hit_on_soft_17"
+        }
+    },
+    "player":{
+        "class":"Player",
+        "params":{
+            "strategy":"basic"
+        }
+    },
+    "shoe":{
+        "class":"Shoe",
+        "params":{
+            "size":1,
+            "cut_card_position":0.75
+        }
+    }
+}
