@@ -104,10 +104,11 @@ class Hand(collections.MutableSequence):
             return "Splittable", "AA" if all(self._a_idx) else str(self.value)
         elif self.soft:
             return "Soft", str(self.value)
-        elif not self.soft:
-            return "Hard", str(self.value)
+        # elif not self.soft:
         else:
-            raise Exception ("There is no strategy value for {}".format(self))
+            return "Hard", str(self.value)
+        # else:
+        #     raise Exception ("There is no strategy value for {}".format(self))
 
     @property
     def bust(self):
@@ -183,6 +184,8 @@ class Shoe(object):
         return "{} Deck Shoe with {} cards left or {:.2f} % Penetration".format(self.size, self.__len__(), self._penetration_state*100)
 
     def draw(self, number=1, **kwargs):
+        if len(self) < number:
+            self = self(True)
         _d = self._shoe[:number].copy()
         self._dealt.extend(_d)
         del self._shoe[:number]

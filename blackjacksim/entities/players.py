@@ -114,6 +114,10 @@ class Dealer(object):
                     self.hand.stand = True
                 elif action == 'Hit':
                     self.hand.extend(shoe.draw(1))
+                elif action == 'Bust':
+                    self.hand.stand = True
+                else:
+                    print(self.hand, action)
 
         return shoe
 
