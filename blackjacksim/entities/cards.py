@@ -187,3 +187,9 @@ class Shoe(object):
         self._dealt.extend(_d)
         del self._shoe[:number]
         return Hand(_d, **self.house_rules.hand_rules)
+
+class CustomShoe(Shoe):
+    def __init__(self, decks, size, cut_card_position, house_rules):
+        super(CustomShoe, self).__init__(size, cut_card_position, house_rules)
+        for deck in decks:
+            self._shoe.extend(deck)
