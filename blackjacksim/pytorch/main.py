@@ -46,7 +46,7 @@ def main():
     train_loader = dataloader.BlackjackDataset(batch_size=batch_size)
     val_loader = dataloader.BlackjackDataset(batch_size=batch_size)
 
-    d = models.DisTwoLinear(10)
+    d = models.DisFiveLinearReLu(10)
     d = torch.nn.DataParallel(d).to(device)
     d.apply(models.weights_init)
     optimizer = optim.SGD(d.parameters(), lr=1e-3)

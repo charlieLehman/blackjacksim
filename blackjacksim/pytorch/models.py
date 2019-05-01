@@ -46,6 +46,27 @@ class DisThreeLinear(nn.Module):
         return y
 
 
+class DisFiveLinearReLu(nn.Module):
+    def __init__(self, dim):
+        super(DisFiveLinearReLu, self).__init__()
+        self.classifier = nn.Sequential(
+            nn.Linear(dim, 10),
+            nn.ReLU(),
+            nn.Linear(10, 10),
+            nn.ReLU(),
+            nn.Linear(10, 10),
+            nn.ReLU(),
+            nn.Linear(10, 10),
+            nn.ReLU(),
+            nn.Linear(10, 1),
+            nn.Sigmoid(),
+        )
+
+    def forward(self, x):
+        y = self.classifier(x)
+        return y
+
+
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
