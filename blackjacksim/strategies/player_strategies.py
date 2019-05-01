@@ -19,7 +19,7 @@ def basic(hand, dealer_up_card):
         print('Check your strategy JSON for the below condition')
         print(e)
         print(e, hand, n, _type, _v)
-        raise
+        return False
 
 def random(hand, dealer_up_card):
     return random.choice(['Hit', 'Stand'])
