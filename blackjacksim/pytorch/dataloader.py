@@ -22,7 +22,7 @@ class BlackjackDataset(Dataset):
             g.round()
         S = np.stack(g.data.State)
         w = np.array(g.data.Advantage.apply(np.sign))
-        w[w==0] = -1
+        # w[w==0] = -1
         w = w[S.sum(1)!=shoesize*52]
         S = S[S.sum(1)!=shoesize*52]
         idx = np.random.permutation(range(len(w)))
