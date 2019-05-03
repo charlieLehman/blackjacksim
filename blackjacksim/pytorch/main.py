@@ -70,7 +70,7 @@ def main():
 
         d_adam = models.DisFiveLinearReLu(10)
         d_adam = torch.nn.DataParallel(d_adam).to(device)
-        checkpointdir = './checkpoints/DisFiveLinearReLu_sgd-lr-1e-3_epoch-100/model_best.pth.tar'
+        checkpointdir = './checkpoints/DisFiveLinearReLu_adam-lr-1e-3_epoch-100/model_best.pth.tar'
         if os.path.isfile(checkpointdir):
             print("=> loading checkpoint '{}'".format(checkpointdir))
             d_adam_ckpt = torch.load(checkpointdir)
@@ -80,7 +80,7 @@ def main():
                   .format(checkpointdir, d_adam_ckpt['epoch'], best_acc))
         else:
             print("=> no checkpoint found at '{}'".format(checkpointdir))
-
+        #
         nsamples_per_state_sum = 200
         _, _, state_output_adam = bettingstrat.test(d_adam, device, eval_loader, 1, args.print_freq,
                                                     nsamples_per_state_sum)
@@ -89,7 +89,7 @@ def main():
         for i in range(13, 49):
             output_avg[i - 13, 0] = state_output_sgd[i] / nsamples_per_state_sum
             output_avg[i - 13, 1] = state_output_adam[i] / nsamples_per_state_sum
-        vis_tool.vis_output_avg([i for i in range(13, 49)], output_avg)
+        vis_tool.vis_output_avg([i for i in range(13, 49)], output_avg, )
 
         return
 
