@@ -1,2 +1,10 @@
 __pycache__
 *.#*
+checkpoints/
+logs/
+*.png
+*.tar
+*.jpg
+*.csv
+.idea
+notebooks/*
